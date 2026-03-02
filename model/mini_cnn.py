@@ -1,5 +1,6 @@
 import torch.nn as nn
 
+
 padding = 1
 kernel_size = 3
 img_size = 224
@@ -17,17 +18,17 @@ class ConvBlock(nn.Module):
         self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size,padding=padding)
         self.batchNorm1 = nn.BatchNorm2d(out_channels)
         self.relu1 = nn.ReLU(inplace=True)
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size,padding=padding)
-        self.batchNorm2 = nn.BatchNorm2d(out_channels)
-        self.relu2 = nn.ReLU(inplace=True)
+        #self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size,padding=padding)
+        #self.batchNorm2 = nn.BatchNorm2d(out_channels)
+        #self.relu2 = nn.ReLU(inplace=True)
 
     def forward(self, x):
         x = self.conv1(x)
         x = self.batchNorm1(x)
         x = self.relu1(x)
-        x = self.conv2(x)
-        x = self.batchNorm2(x)
-        x = self.relu2(x)
+        #x = self.conv2(x)
+        #x = self.batchNorm2(x)
+        #x = self.relu2(x)
         return x
 
 
@@ -53,7 +54,7 @@ class MiniCNN(nn.Module):
 
         # level 5 : 128*14×14
         self.conv5 = ConvBlock(128,256)
-        self.pool5 = nn.MaxPool2d(2) # → 246*7×7
+        self.pool5 = nn.MaxPool2d(2) # → 256*7×7
 
         self.head = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
