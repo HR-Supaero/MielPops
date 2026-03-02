@@ -2,44 +2,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 
-TRAIN_DIR = "data/train"
-
-def count_images_per_class(train_dir: str, extension: str = ".jpg") -> pd.DataFrame:
-    """
-    Parcourt un dossier train et compte le nombre d'images par sous-dossier.
-
-    Parameters
-    ----------
-    train_dir : str
-        Chemin vers data/train
-    extension : str
-        Extension des fichiers image à compter
-
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame indexée par nom de classe avec colonne 'n_images'
-    """
-
-    train_path = Path(train_dir)
-
-    data = []
-
-    # Parcours des sous-dossiers (espèces)
-    for subfolder in sorted(train_path.iterdir()):
-        if subfolder.is_dir():
-            n_images = len(list(subfolder.glob(f"*{extension}")))
-
-            data.append({
-                "class_name": subfolder.name,
-                "n_images": n_images
-            })
-
-    # Création dataframe
-    df = pd.DataFrame(data)
-    df = df.set_index("class_name").sort_values("n_images", ascending=False)
-
-    return df
+from imbalance_reasonable import count_images_per_class, TRAIN_DIR
 
 def plot_class_distribution(df):
 

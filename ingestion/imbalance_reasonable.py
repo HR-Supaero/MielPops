@@ -2,9 +2,48 @@ import pickle
 import cv2
 import plotly.express as px
 import numpy as np
+import pandas as pd
 import random
+from pathlib import Path
 
-import imbalance_viz
+TRAIN_DIR = "data/train"
+
+def count_images_per_class(train_dir: str, extension: str = ".jpg") -> pd.DataFrame:
+    """
+    Parcourt un dossier train et compte le nombre d'images par sous-dossier.
+
+    Parameters
+    ----------
+    train_dir : str
+        Chemin vers data/train
+    extension : str
+        Extension des fichiers image à compter
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame indexée par nom de classe avec colonne 'n_images'
+    """
+
+    train_path = Path(train_dir)
+
+    data = []
+
+    # Parcours des sous-dossiers (espèces)
+    for subfolder in sorted(train_path.iterdir()):
+        if subfolder.is_dir():
+            n_images = len(list(subfolder.glob(f"*{extension}")))
+
+            data.append({
+                "class_name": subfolder.name,
+                "n_images": n_images
+            })
+
+    # Création dataframe
+    df = pd.DataFrame(data)
+    df = df.set_index("class_name").sort_values("n_images", ascending=False)
+
+    return df
 
 def show_cv2_plotly(img):
     # Convert BGR → RGB (IMPORTANT)
@@ -84,16 +123,16 @@ def augmentation_toupie_bleyblade_var(list_data, n_aug):
 
 
 def augmentation_1_species(list_data, species_name):
+    df_counts = count_images_per_class(train_dir=TRAIN_DIR)
+    n_max = df_counts["n_images"].max()
+    df_counts["n_images_to_add"] = np.minimum(df_counts["n_images"] * 50, n_max) - df_counts["n_images"]
+    
     current_n = df_counts["n_images"][species_name]
     n_aug = df_counts["n_images_to_add"][species_name]//current_n
     
     return augmentation_toupie_bleyblade_var(list_data=list_data, n_aug=n_aug)
 
 if __name__ == "__main__":
-    df_counts = imbalance_viz.count_images_per_class(train_dir=imbalance_viz.TRAIN_DIR)
-    n_max = df_counts["n_images"].max()
-    df_counts["n_images_to_add"] = np.minimum(df_counts["n_images"] * 50, n_max) - df_counts["n_images"]
-
     # LOADING RESIZED
     folder_name = "Andrena aerinifrons" # also folder name ?
     with open('data/Andrena_aerinifrons.pkl', 'rb') as f:
