@@ -72,7 +72,7 @@ if True :
 print("\n"*4)
 
 #############################################################################
-# 3. Expand edges and blur the added edges
+# 4. Expand edges and blur the added edges
 #############################################################################
 
 # resize loaded images and blur them
@@ -87,3 +87,25 @@ except : pass
 # save to new folder
 if True :
     loader.save_img_to_folder(new_path="./IMAGE_SUPPRIME_EXPANDED_BLURRED/", cv_img=cv_img_resized)
+
+
+#############################################################################
+# 5. Automatically resize and Expand edges and blur the added edges
+#############################################################################
+
+# resize loaded images and blur them
+cv_img_resized = resizer.auto_rescale_expand(cv_img_list=cv_img, target_size=(512, 512), noisy=noisy, blur=True)
+
+# print result
+print(f"Returned list of {len(cv_img_resized)} images")
+try :
+    print(f"shape of first image is {cv_img_resized[0].shape}")
+except : pass
+
+# save to new folder
+if True :
+    loader.save_img_to_folder(new_path="./IMAGE_SUPPRIME_AUTO/", cv_img=cv_img_resized)
+
+#############################################################################
+# 6. Test convert function
+#############################################################################
