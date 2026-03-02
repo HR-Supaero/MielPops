@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 
+TRAIN_DIR = "data/train"
 
 def count_images_per_class(train_dir: str, extension: str = ".jpg") -> pd.DataFrame:
     """
@@ -94,7 +95,6 @@ def plot_pie(df, top_n=10):
 
 
 if __name__ == "__main__":
-    TRAIN_DIR = "data/train"
     df_counts = count_images_per_class(TRAIN_DIR)
     print(df_counts.head())
 
