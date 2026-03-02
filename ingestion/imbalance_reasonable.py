@@ -2,6 +2,7 @@ import pickle
 import cv2
 import plotly.express as px
 import numpy as np
+import random
 
 import imbalance_viz
 
@@ -55,13 +56,29 @@ def rotate_img(img, angle):
     # Rotation + taille originale mais coupe les images
     return cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
 
+def random_contrast_brightness(img, alpha_range=(0.8, 1.2), beta_range=(-30, 30)):
+    """
+    Change contrast and brightness randomly
+    alpha_range: multiplicateur de contraste
+    beta_range: décalage luminosité
+    """
+    alpha = random.uniform(*alpha_range)
+    beta = random.uniform(*beta_range)
+    new_img = cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
+    return new_img
+
 def augmentation_toupie_bleyblade_var(list_data, n_aug):
     list_data_augmented = []
     for i, img in enumerate(list_data):
         img_list = [img]
         for a in range(n_aug) :
             alpha = a*360/n_aug
-            img_list.append(rotate_img(img=img, angle=alpha))
+            rotated = rotate_img(img=img, angle=alpha)
+            rotated_lum = random_contrast_brightness(img=rotated)
+            img_list.append(rotated_lum)
+        # if i == 13:
+        #     for img_r in img_list:
+        #         show_cv2_plotly(img_r)
         list_data_augmented += img_list
     return list_data_augmented
 
