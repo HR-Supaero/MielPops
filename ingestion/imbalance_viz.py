@@ -44,26 +44,36 @@ def plot_histogram(df):
     fig.show()
 
 def plot_pie(df, top_n=10):
+    df = df.sort_values("n_images", ascending=False)
     df_top = df.head(top_n)
 
+    other = pd.DataFrame({
+        "index": ["Other"],
+        "n_images": [df.iloc[top_n:]["n_images"].sum()]
+    }).set_index("index")
+
+    df_final = pd.concat([df_top, other])
+    print(other)
+
     fig = px.pie(
-        df_top.reset_index(),
-        names="class_name",
+        df_final.reset_index(),
+        names="index",
         values="n_images",
         title=f"Top {top_n} classes",
         template="plotly_white"
     )
+    fig.update_traces(pull=[0.1 if i=="Other" else 0 for i in df_final.index])
 
     fig.show()
 
 
 if __name__ == "__main__":
     df_counts = count_images_per_class(TRAIN_DIR)
-    print(df_counts.head())
+    print(df_counts)
 
     plot_class_distribution(df_counts)
     # plot_histogram(df_counts)
-    # plot_pie(df_counts, top_n=len(df_counts))
+    plot_pie(df_counts, top_n=21)
 
     print("Nombre total d'images :", df_counts["n_images"].sum())
     print("Nombre de classes :", len(df_counts))
