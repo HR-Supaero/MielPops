@@ -2,27 +2,60 @@ import torch
 import torchvision
 import numpy as np
 import csv
+from tqdm import tqdm
+from model.loader import load_dataset, load_test_loader
 
-def prediction_to_csv(data_set,model) :
+def prediction_to_csv(dir,model, img_size=224, batch_size=16) :
+    """
+    Charge un dataset et retourne le csv des predictions associé.
+    """
 
-    test_set = load_data_set(data_set)
+    # Check for GPU availability
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        print(f"✓ Using GPU: {torch.cuda.get_device_name(0)}")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print("✓ Using Apple Silicon GPU (MPS)")
+    else:
+        device = torch.device("cpu")
+        print("⚠ Using CPU - training will be slow!")
+
+    model = model.to(device)
+    model.eval()
+
+    test_loader = load_test_loader(dir, img_size, batch_size)
+
+    # enregistre les predictions
     predictions_array = []
 
-    for i,img in enumerate(test_set) :
-        img_logits = model(img)
-        preds = img_logits.argmax(dim=1)
-        prediction_entry = {
-            "id" : i,
-            "label" : preds
-        }
-        predictions_array.append(prediction_entry)
+    with torch.no_grad() :
+        
+        pbar = tqdm(
+            test_loader,
+            desc="Inference"
+        )
 
-    prediction_csv = f"result/sumbition_csv/{data_set}_{model}.csv"
+        for images, ids in pbar :
 
-    with open(prediction_csv, "w", newline='', encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames = ["id", "label"])
-        writer.writeheader()
-        writer.writerows(predictions_array)
-    print(f"Les predictions ont été sauvegardees dans {fichier_logs}.")
+            images = images.to(device) # a modifier en fonction du test_set
+            img_logits = model(images)
 
-    return
+
+            predictions = img_logits.argmax(dim=1)
+            predictions = predictions.cpu().numpy()
+
+            for img_id, pred in zip(ids, predictions):
+                predictions_array.append({
+                    "id": img_id,
+                    "label": int(pred)
+                })
+
+        output_path = f"prediction.csv"
+
+        # Sauvegarde CSV
+        with open(output_path, "w", newline='', encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames = ["id", "label"])
+            writer.writeheader()
+            writer.writerows(predictions_array)
+        print(f"Les predictions ont été sauvegardees dans {output_path}.")
