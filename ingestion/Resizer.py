@@ -7,6 +7,10 @@ import numpy as np
 A class to resize loaded images using cv2.
 Use as follow :
 
+loader = Loader()
+cv_img = loader.load_folder(path="./path", file_type="jpg", noisy=True)
+resizer = Resizer()
+cv_img_resized = resizer.resize(cv_img_list=cv_img, target_size=(512, 512), noisy=True)
 
 """
 class Resizer():
@@ -38,6 +42,35 @@ class Resizer():
             count_img += 1 
             if noisy : print(f"Expanded image {count_img} edges from {old_shape} to {target_size}")
         return expanded_img_list
+    
+    def auto_rescale_expand(self, cv_img_list, target_size=(512, 512), noisy=True, blur=False):
+        # rescale image if it is small, expand it if it is big and mix the two when needed
+        expanded_img_list = []
+        count_img = 0 
+        for img in cv_img_list :
+            old_shape = img.shape
+            if old_shape == target_size :
+                if noisy : print(f"image already has target shape of {target_size}")
+                new_image = np.copy(img)
+            else :
+                # image needs resizing
+                factor_w = target_size[0] / old_shape[0]
+                factor_h = target_size[1] / old_shape[1]
+                # how much the image can be distorted and still fit in
+                global_extension_factor = min(factor_h, factor_w)
+                # resize
+                resized_img = cv2.resize(img, None, fx=global_extension_factor, 
+                                            fy=global_extension_factor, interpolation=cv2.INTER_AREA)
+
+                # expand the edges of the image
+                new_img = self._expand_edges_one_image(resized_img, target_size=target_size, 
+                                                    border_type=cv2.BORDER_REPLICATE, value=0, blur=blur)
+            expanded_img_list.append(new_img)
+            count_img += 1 
+            if noisy : print(f"Expanded image {count_img} edges from {old_shape} to {target_size}")
+        return expanded_img_list
+
+
 
     def _expand_edges_one_image(self, img, target_size=(512, 512), border_type=cv2.BORDER_REPLICATE, value=0, blur=False):
         h, w = img.shape[:2]
@@ -73,6 +106,7 @@ class Resizer():
             # replace the image
             expanded_img = out
         return expanded_img
+    
 
 
 
