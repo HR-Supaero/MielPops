@@ -16,11 +16,28 @@ class Loader():
     def __init__(self):
         return None
 
+    def convert_folder_to_jpg(self, path, file_types=["png", "jpeg"]):
+        if path[-1] != "/":
+            path += "/"
+        if not os.path.isdir(path):
+            print(f"Loader (convert) :: ERROR : PATH {path} DOES NOT EXIST")
+            return None
+        
+        for file_type in file_types :
+            pattern = f"{path}*.{file_type}"
+            if noisy : print(f"Converting image like {pattern}")
+            globpath = glob.glob(pattern)
+            for img in globpath:
+                im = Image.open(img)
+                rgb_im = im.convert('RGB')
+                rgb_im.save(img[:-len(file_type)] + ".jpg")
+                print(f"Saved image {img[:-len(file_type)] + ".jpg"} to jpg")
+
     def load_folder(self, path, file_type="jpg", noisy=True):
         if path[-1] != "/":
             path += "/"
         if not os.path.isdir(path):
-            print(f"Loader :: ERROR : PATH {path} DOES NOT EXIST")
+            print(f"Loader (load) :: ERROR : PATH {path} DOES NOT EXIST")
             return None
         pattern = f"{path}*.{file_type}"
         if noisy : print(f"Loading image like {pattern}")
