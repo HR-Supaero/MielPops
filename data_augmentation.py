@@ -3,12 +3,13 @@ from ingestion.Resizer import Resizer
 from ingestion.imbalance_reasonable import augmentation_1_species
 import os
 
-
-
+OUT_SIZE = (224, 224)
 image_path = "./data/train/"
 treated_image_path = "./data/treated_train/"
 test_image_path = "./data/test"
 treated_test_image_path = "./data/treated_test"
+
+
 
 # get all class folders
 all_files_and_folders = os.listdir(image_path)
@@ -53,7 +54,7 @@ for species in all_folders :
 
     # resize loaded images
     print(f"Resizing images of folder {species}...")
-    cv_img_resized = resizer.auto_rescale_expand(cv_img_list=cv_img, target_size=(512, 512), noisy=False)
+    cv_img_resized = resizer.auto_rescale_expand(cv_img_list=cv_img, target_size=OUT_SIZE, noisy=False)
     print(f"... {len(cv_img_resized)} images of folder {species} resized !")
     try :
         print(f"Shape of first image is {cv_img_resized[0].shape}")
@@ -95,7 +96,7 @@ print(file_names)
 
 # resize loaded images
 print(f"Resizing images of test folder...")
-cv_img_resized = resizer.auto_rescale_expand(cv_img_list=cv_img, target_size=(512, 512), noisy=False)
+cv_img_resized = resizer.auto_rescale_expand(cv_img_list=cv_img, target_size=OUT_SIZE, noisy=False)
 print(f"... {len(cv_img_resized)} images of test folder resized !")
 try :
     print(f"Shape of first image is {cv_img_resized[0].shape}")
