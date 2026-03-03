@@ -59,3 +59,58 @@ def prediction_to_csv(dir,model, img_size=224, batch_size=16) :
             writer.writeheader()
             writer.writerows(predictions_array)
         print(f"Les predictions ont été sauvegardees dans {output_path}.")
+
+def prediction_val_to_csv(dataset,model,output_path="prediction_val.csv") :
+    """
+    Charge un dataset et retourne le csv des predictions associées.
+    """
+
+    # Check for GPU availability
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        print(f"✓ Using GPU: {torch.cuda.get_device_name(0)}")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print("✓ Using Apple Silicon GPU (MPS)")
+    else:
+        device = torch.device("cpu")
+        print("⚠ Using CPU - training will be slow!")
+
+    model = model.to(device)
+    model.eval()
+
+    id = 0
+
+    # enregistre les predictions
+    predictions_array = []
+
+    with torch.no_grad() :
+        
+        pbar = tqdm(
+            dataset,
+            desc="Inference"
+        )
+
+        for images, labels in pbar :
+
+            images = images.to(device) # a modifier en fonction du test_set
+            img_logits = model(images)
+
+
+            predictions = img_logits.argmax(dim=1)
+            predictions = predictions.cpu().numpy()
+
+            for pred, label in zip(predictions, labels):
+                id += 1
+                predictions_array.append({
+                    "id": id,
+                    "pred": int(pred),
+                    "true": int(label)
+                })
+
+        # Sauvegarde CSV
+        with open(output_path, "w", newline='', encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames = ["id", "pred", "true"])
+            writer.writeheader()
+            writer.writerows(predictions_array)
+        print(f"Les predictions ont été sauvegardees dans {output_path}.")
