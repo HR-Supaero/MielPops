@@ -7,7 +7,7 @@ import pandas as pd
 
 OUT_SIZE = (224, 224)
 image_path = "./data/train/"
-hierarchical_path = "./data/hierarchical/"
+hierarchical_path = "./data/hierarchical_level1/"
 test_image_path = "./data/test"
 treated_test_image_path = "./data/treated_test"
 
@@ -100,24 +100,42 @@ for species in all_folders:
         )
 
 
+# ================================
+# CSV CREATION — LEVEL 1 (REINDEXED)
+# ================================
+
 df = pd.read_csv("./data/train.csv")
 
 # extraire le nom d'espèce
 df['species'] = df['id'].str.split('/').str[1]
 
-# regrouper les espèces >= 106 dans "others"
+# regrouper les espèces rares dans "others"
 df['species'] = df['species'].apply(
     lambda x: x if image_counts[x] > THRESHOLD else "others"
 )
 
-# labels
+# label original
 df.loc[df['species'] == "others", 'label'] = 99
 
+# ne garder qu’une ligne par classe
 df = df[['species', 'label']].drop_duplicates().reset_index(drop=True)
 
-df.to_csv("./data/hierarchical.csv", index=False)
+# 🔑 REINDEXATION DES LABELS
+original_labels = sorted(df['label'].unique())
+label_to_hier = {lbl: i for i, lbl in enumerate(original_labels)}
+hier_to_label = {i: lbl for lbl, i in label_to_hier.items()}
 
-id_to_label = dict(zip(df['species'], df['label']))
+df['hier_label'] = df['label'].map(label_to_hier)
+
+# sauvegardes
+df[['species', 'hier_label']].to_csv("./data/hierarchical_level1.csv", index=False)
+
+# sauvegarde du mapping pour l'inférence
+pd.DataFrame.from_dict(
+    hier_to_label, orient="index", columns=["original_label"]
+).to_csv("./data/hierarchical_label_mapping_level1.csv")
+
+print("LEVEL 1 CSV + label mapping saved")
 #######################################
 # edit test images
 #######################################
