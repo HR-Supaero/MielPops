@@ -1,6 +1,7 @@
 from ingestion.Loader import Loader
 from ingestion.Resizer import Resizer
 from ingestion.imbalance_reasonable import augmentation_1_species
+from ingestion.imbalance_equal import augmentation_1_species_all
 import os
 
 OUT_SIZE = (224, 224)
@@ -67,7 +68,7 @@ for species in all_folders :
 
     # Less imbalanced output but still not equal classes
     print(f"Augmenting number of images of folder {species}...")
-    cv_img_augmented = augmentation_1_species(cv_img_resized, species_name=species)
+    cv_img_augmented = augmentation_1_species_all(cv_img_resized, species_name=species)
     print(f"... {len(cv_img_resized)} images of folder {species} have been transformed in {len(cv_img_augmented)} images !")
     print("\n"*3)
 
