@@ -75,6 +75,8 @@ for species in all_folders :
 
 
     # save to new folder
+    if not(os.path.exists(treated_image_path + species + "/")):
+        os.makedirs(treated_image_path + species + "/")
     loader.save_img_to_folder(new_path = treated_image_path + species + "/", 
                                 cv_img=cv_img_augmented)
 
@@ -103,5 +105,7 @@ try :
 except : pass
 print("\n"*3)
 
+if not(os.path.exists(treated_test_image_path)):
+        os.makedirs(treated_test_image_path)
 loader.save_img_to_folder(new_path = treated_test_image_path, 
                                 cv_img=cv_img_resized, name_list=file_names)

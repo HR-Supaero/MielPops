@@ -31,7 +31,7 @@ class Loader():
                 im = Image.open(img)
                 rgb_im = im.convert('RGB')
                 rgb_im.save(img[:-len(file_type)] + ".jpg")
-                print(f"Saved image {img[:-len(file_type)] + ".jpg"} to jpg")
+                print(f"Saved image {img[:-len(file_type)]}.jpg to jpg")
 
     def load_folder(self, path, file_type="jpg", noisy=True, keep_names=False):
         if path[-1] != "/":
