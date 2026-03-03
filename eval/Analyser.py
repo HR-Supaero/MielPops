@@ -9,10 +9,12 @@ from sklearn.metrics import f1_score, accuracy_score
 import pandas as pd
 import random
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-CLASS_LIST = os.listdir("data/train")
-CLASS_LIST.sort()  # Ensure consistent order
-print(f"Classes: {CLASS_LIST}")
+# CLASS_LIST = os.listdir("data/train")
+# CLASS_LIST.sort()  # Ensure consistent order
+# print(f"Classes: {CLASS_LIST}")
 
 class Analyser():
     def __init__(self, data):
@@ -32,6 +34,34 @@ class Analyser():
         }
         return report
     
+def plot_f1_report(report_dict):
+    """
+    Plot le F1-score par classe + la moyenne.
+    """
+
+    f1_scores = report_dict["f1_score_per_class"]
+    f1_avg = report_dict["f1_score_avg"]
+    best_class = int(report_dict["best_f1"])
+
+    plt.figure(figsize=(12, 5))
+
+    # Barres
+    plt.bar(range(len(f1_scores)), f1_scores)
+
+    # Ligne moyenne
+    plt.axhline(y=f1_avg)
+
+    # Highlight meilleure classe
+    plt.scatter(best_class, f1_scores[best_class])
+
+    plt.title("F1-score par classe")
+    plt.xlabel("Classe")
+    plt.ylabel("F1-score")
+    plt.xticks(range(len(f1_scores)))
+    plt.ylim(0, 1)
+
+    plt.show()
+    
 if __name__ == "__main__":
     # Example usage
     data = pd.DataFrame({
@@ -42,3 +72,4 @@ if __name__ == "__main__":
     analyser = Analyser(data)
     report = analyser.generate_report()
     print(report)
+    plot_f1_report(report)
