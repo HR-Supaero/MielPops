@@ -35,5 +35,4 @@ def compute_class_weights(path):
         else:
             weights[folder] = 0.0  # Assign null weight for empty folders
             
-    weights = torch.tensor(list(weights.values()), dtype=torch.float32)
     return weights
