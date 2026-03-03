@@ -31,9 +31,9 @@ class Loader():
                 im = Image.open(img)
                 rgb_im = im.convert('RGB')
                 rgb_im.save(img[:-len(file_type)] + ".jpg")
-                print(f"Saved image {img[:-len(file_type)] + ".jpg"} to jpg")
+                print(f"Saved image {img[:-len(file_type)]}.jpg to jpg")
 
-    def load_folder(self, path, file_type="jpg", noisy=True):
+    def load_folder(self, path, file_type="jpg", noisy=True, keep_names=False):
         if path[-1] != "/":
             path += "/"
         if not os.path.isdir(path):
@@ -44,16 +44,24 @@ class Loader():
         globpath = glob.glob(pattern)
         if noisy : print("glob glob")
         cv_img = []
+        self.names = []
         count_img = 0
         for img in globpath:
             readimg = cv2.imread(img)
             cv_img.append(readimg)
             count_img += 1 
-            if noisy : print(f"Loaded image {count_img} : {img }")
+            if noisy : print(f"Loaded image {count_img} : {img}")
+            if keep_names : self.names.append(img.split("/")[-1]) # keep only the name of the file, not the directory
         print("Done !")
         return cv_img
     
-    def save_img_to_folder(self, new_path, cv_img, noisy=True):
+    def get_loaded_file_names(self):
+        try:
+            return self.names
+        except :
+            print("self.names does not exist, execute load_folder with keep_names=True beforehand")
+    
+    def save_img_to_folder(self, new_path, cv_img, noisy=True, name_list=None):
         if new_path[-1] != "/":
             new_path += "/"
         # Create the directory
@@ -71,8 +79,12 @@ class Loader():
         # done with folder, writing
         count_img = 0
         for img in cv_img :
+            # rename file if needed
+            if name_list is None :
+                export_file = f"{new_path}image_{count_img}.jpg"
+            else :
+                export_file = f"{new_path}{name_list[count_img]}"
             count_img += 1
-            export_file = f"{new_path}image_{count_img}.jpg"
             cv2.imwrite(export_file, img)
             if noisy : print(f"Written image {count_img} to {export_file}")
         return None

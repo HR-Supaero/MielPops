@@ -1,10 +1,11 @@
 from pathlib import Path
 import pandas as pd
 import plotly.express as px
+import os
 
 from imbalance_reasonable import count_images_per_class, TRAIN_DIR
 
-def plot_class_distribution(df):
+def plot_class_distribution(df, title="Nombre d'images par espèce"):
 
     df_plot = df.reset_index()
 
@@ -18,7 +19,7 @@ def plot_class_distribution(df):
         df_plot,
         x="class_name",
         y="n_images",
-        title="Nombre d'images par espèce",
+        title=title,
         template="plotly_white"
     )
 
@@ -69,13 +70,20 @@ def plot_pie(df, top_n=10):
 
 if __name__ == "__main__":
     df_counts = count_images_per_class(TRAIN_DIR)
-    print(df_counts)
+    # print(df_counts)
 
-    plot_class_distribution(df_counts)
+    plot_class_distribution(df_counts, f"Nombre d'images par espèce dans le dataset original {TRAIN_DIR}")
     # plot_histogram(df_counts)
-    plot_pie(df_counts, top_n=21)
+    # plot_pie(df_counts, top_n=21)
 
     print("Nombre total d'images :", df_counts["n_images"].sum())
     print("Nombre de classes :", len(df_counts))
     print("Classe la plus représentée :", df_counts.index[0])
     print("Classe la moins représentée :", df_counts.index[-1])
+
+    treated_image_path = "./data/treated_train/"
+    if os.path.exists(treated_image_path):
+
+        df_counts_treated = count_images_per_class(treated_image_path)
+        plot_class_distribution(df_counts_treated, f"Nombre d'images par espèce dans le dataset augmenté {treated_image_path}")
+        # print(df_counts_treated)

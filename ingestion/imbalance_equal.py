@@ -88,6 +88,20 @@ def random_flip(img):
     return img
 
 # ----------------------------
+# Changements contraste aléatoires
+# ----------------------------
+def random_contrast_brightness(img, alpha_range=(0.8, 1.2), beta_range=(-30, 30)):
+    """
+    Change contrast and brightness randomly
+    alpha_range: multiplicateur de contraste
+    beta_range: décalage luminosité
+    """
+    alpha = random.uniform(*alpha_range)
+    beta = random.uniform(*beta_range)
+    new_img = cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
+    return new_img
+
+# ----------------------------
 # Augmentation complète aléatoire
 # ----------------------------
 import random
@@ -113,6 +127,8 @@ def augment_list_random(list_data, n_aug=5, show=False, show_prob=0.1):
             img_aug = rotate_img_random(img_aug, max_angle=360)
             # Flip aléatoire
             img_aug = random_flip(img_aug)
+            # Changement contraste brillance aléatoire
+            img_aug = random_contrast_brightness(img=img_aug)
 
             list_data_aug.append(img_aug)
             # Affichage aléatoire selon show_prob
@@ -130,7 +146,7 @@ def augmentation_1_species_all(list_data, species_name):
     current_n = df_counts["n_images"][species_name]
     n_aug = df_counts["n_images_to_add"][species_name]//current_n
     
-    return augment_list_random(list_data=list_data, n_aug=n_aug, show=True)
+    return augment_list_random(list_data=list_data, n_aug=n_aug, show=False)
 
 if __name__ == "__main__":
     # LOADING RESIZED
