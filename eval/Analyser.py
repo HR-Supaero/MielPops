@@ -19,7 +19,7 @@ class Analyser():
         self.data = data
 
     def f1_score_avg(self):
-        return f1_score(self.data["true"], self.data["pred"], average="weighted")
+        return f1_score(self.data["true"], self.data["pred"], average="macro")
     
     def f1_score_per_class(self):
         return f1_score(self.data["true"], self.data["pred"], average=None)
