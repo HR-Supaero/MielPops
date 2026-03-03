@@ -1,5 +1,4 @@
 import os
-import torch
 
 def compute_class_weights(path):
     """
