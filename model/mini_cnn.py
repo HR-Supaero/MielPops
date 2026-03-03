@@ -18,23 +18,23 @@ class ConvBlock(nn.Module):
         self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size,padding=padding)
         self.batchNorm1 = nn.BatchNorm2d(out_channels)
         self.relu1 = nn.ReLU(inplace=True)
-        #self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size,padding=padding)
-        #self.batchNorm2 = nn.BatchNorm2d(out_channels)
-        #self.relu2 = nn.ReLU(inplace=True)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size,padding=padding)
+        self.batchNorm2 = nn.BatchNorm2d(out_channels)
+        self.relu2 = nn.ReLU(inplace=True)
 
     def forward(self, x):
         x = self.conv1(x)
         x = self.batchNorm1(x)
         x = self.relu1(x)
-        #x = self.conv2(x)
-        #x = self.batchNorm2(x)
-        #x = self.relu2(x)
+        x = self.conv2(x)
+        x = self.batchNorm2(x)
+        x = self.relu2(x)
         return x
 
 
   
 class MiniCNN(nn.Module):
-    def __init__(self, num_classes=10):
+    def __init__(self,img_size=224,num_class=50):
         super().__init__()
         # level 1: 3*224*224
         self.conv1 = ConvBlock(3,16)

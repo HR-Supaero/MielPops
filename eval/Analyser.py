@@ -14,7 +14,7 @@ CLASS_LIST = os.listdir("data/train")
 CLASS_LIST.sort()  # Ensure consistent order
 print(f"Classes: {CLASS_LIST}")
 
-class Analyser:
+class Analyser():
     def __init__(self, data):
         self.data = data
 
