@@ -7,6 +7,13 @@ Bee the best version of yourself honey
 ​🍯​🍯​🍯​🍯​🍯​🍯​🍯
 🐝🐝🐝🐝🐝🐝🐝
 
+## Description
+
+This repo contains the code for the MielPops team take on Supaero SDD 2026 Hackaton challenge issued by SETE CNRS. The objective is the following:
+
+
+
+
 
 ## Architecture
 
