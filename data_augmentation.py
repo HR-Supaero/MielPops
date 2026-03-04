@@ -54,7 +54,7 @@ for species in all_folders :
 
     # resize loaded images
     print(f"Resizing images of folder {species}...")
-    cv_img_resized = resizer.auto_rescale_expand(cv_img_list=cv_img, target_size=OUT_SIZE, noisy=False)
+    cv_img_resized = resizer.auto_rescale_expand(cv_img_list=cv_img, target_size=OUT_SIZE, noisy=False, blur=True)
     print(f"... {len(cv_img_resized)} images of folder {species} resized !")
     try :
         print(f"Shape of first image is {cv_img_resized[0].shape}")
@@ -98,7 +98,7 @@ print(file_names)
 
 # resize loaded images
 print(f"Resizing images of test folder...")
-cv_img_resized = resizer.auto_rescale_expand(cv_img_list=cv_img, target_size=OUT_SIZE, noisy=False)
+cv_img_resized = resizer.auto_rescale_expand(cv_img_list=cv_img, target_size=OUT_SIZE, noisy=False, blur=True)
 print(f"... {len(cv_img_resized)} images of test folder resized !")
 try :
     print(f"Shape of first image is {cv_img_resized[0].shape}")
