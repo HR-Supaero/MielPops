@@ -15,7 +15,7 @@ class CustomSkibidiDataset(Dataset):
         
         # load the species to id dataframe
         df_id_mapper = pd.read_csv(csv_mapper)
-        id_to_label = dict(zip(df_id_mapper['id'], df_id_mapper['label']))
+        id_to_label = dict(zip(df_id_mapper['species'], df_id_mapper['label']))
         print(id_to_label)
 
         # Create the DataFrame
