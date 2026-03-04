@@ -1,3 +1,7 @@
+"""
+Run this script to augment the data and save it in a new folder. It will also resize the images to 224*224.
+"""
+
 from ingestion.Loader import Loader
 from ingestion.Resizer import Resizer
 from ingestion.imbalance_reasonable import augmentation_1_species
