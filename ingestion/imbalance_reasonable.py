@@ -1,3 +1,7 @@
+"""
+Functions to handle class imbalance. Meant to make class distribution more reasonable, not uniform
+"""
+
 import pickle
 import cv2
 import plotly.express as px
