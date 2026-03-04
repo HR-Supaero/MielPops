@@ -2,31 +2,85 @@ import torch
 from tqdm import tqdm
 import csv
 import pandas as pd
+from model.loader import load_dataset, load_test_loader
 
+
+# def load_label_mapping(mapping_csv_path):
+#     """
+#     Retourne :
+#     - hier_to_original : dict[int → int]
+#     - others_hier_label : int ou None
+#     """
+#     df = pd.read_csv(mapping_csv_path)
+
+#     hier_to_original = dict(
+#         zip(df["hier_label"], df["original_label"])
+#     )
+
+#     others_rows = df[df["original_label"] == 99]
+#     others_hier_label = (
+#         int(others_rows["hier_label"].iloc[0])
+#         if len(others_rows) > 0 else None
+#     )
+
+#     return hier_to_original, others_hier_label
+
+# def load_label_mapping(mapping_csv_path):
+#     df = pd.read_csv(mapping_csv_path)
+#     df.columns = df.columns.str.strip()
+
+#     print("Columns found:", df.columns.tolist())
+
+#     # Si l'index a été sauvegardé
+#     if "Unnamed: 0" in df.columns:
+#         df = df.rename(columns={"Unnamed: 0": "hier_label"})
+
+#     required_cols = {"hier_label", "original_label"}
+#     if not required_cols.issubset(df.columns):
+#         raise ValueError(
+#             f"{mapping_csv_path} must contain {required_cols}, "
+#             f"but found {df.columns.tolist()}"
+#         )
+
+#     hier_to_original = dict(
+#         zip(df["hier_label"], df["original_label"])
+#     )
+
+#     return hier_to_original, None
 
 def load_label_mapping(mapping_csv_path):
-    """
-    Retourne :
-    - hier_to_original : dict[int → int]
-    - others_hier_label : int ou None
-    """
     df = pd.read_csv(mapping_csv_path)
+    df.columns = df.columns.str.strip()
+
+    # 🔥 CAS 1 : hier_label est stocké comme index
+    if "hier_label" not in df.columns:
+        df = df.reset_index()
+        df = df.rename(columns={"index": "hier_label"})
+
+    # 🔥 CAS 2 : index sauvegardé sous "Unnamed: 0"
+    if "Unnamed: 0" in df.columns:
+        df = df.rename(columns={"Unnamed: 0": "hier_label"})
+
+    required_cols = {"hier_label", "original_label"}
+    if not required_cols.issubset(df.columns):
+        raise ValueError(
+            f"{mapping_csv_path} must contain {required_cols}, "
+            f"but found {df.columns.tolist()}"
+        )
+
+    # sécurité : tout en int
+    df["hier_label"] = df["hier_label"].astype(int)
+    df["original_label"] = df["original_label"].astype(int)
 
     hier_to_original = dict(
         zip(df["hier_label"], df["original_label"])
     )
 
-    others_rows = df[df["original_label"] == 99]
-    others_hier_label = (
-        int(others_rows["hier_label"].iloc[0])
-        if len(others_rows) > 0 else None
-    )
-
-    return hier_to_original, others_hier_label
+    return hier_to_original, None
 
 
 def hierarchical_prediction_to_csv(
-    validation_dataset,
+    dir,
     model1,
     model2,
     model3,
@@ -54,11 +108,13 @@ def hierarchical_prediction_to_csv(
         m.to(device)
         m.eval()
 
+    test_loader = load_test_loader(dir)
+
     predictions_array = []
     id_counter = 0
 
     with torch.no_grad():
-        pbar = tqdm(validation_dataset, desc="Hierarchical inference")
+        pbar = tqdm(test_loader, desc="Hierarchical inference")
 
         for images, labels in pbar:
             images = images.to(device)
